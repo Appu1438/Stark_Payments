@@ -1,0 +1,146 @@
+/* ✅ Use a clean Google Font */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg,
+            var(--primary-color, #665cff),
+            #3e3bb8);
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+}
+
+/* Card */
+.payment-card {
+    background-color: #ffffff;
+    /* max-width: 420px; */
+    width: 90%;
+    padding: 40px 30px;
+    border-radius: 24px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Company Title */
+.company-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-color, #665cff);
+    margin-bottom: 10px;
+}
+
+/* Section Title */
+.payment-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Subtitle */
+.payment-subtext {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+/* Input Field */
+.payment-input {
+    width: 90%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.payment-input:focus {
+    border-color: var(--primary-color, #665cff);
+    box-shadow: 0 0 6px rgba(102, 92, 255, 0.3);
+}
+
+/* Quick Select Amounts */
+.quick-amounts {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin: 0px 0 25px;
+    flex-wrap: wrap;
+}
+
+.quick-amount-btn {
+    background-color: #f1f1f1;
+    /* Light gray */
+    border: 1px solid #d1d1d1;
+    color: #333;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 300;
+    transition: all 0.2s ease;
+}
+
+.quick-amount-btn:hover {
+    background-color: #e4e4e4;
+    /* Slightly darker gray on hover */
+}
+
+.quick-amount-btn.active {
+    background-color: #d1d1d1;
+    /* Active state */
+    border-color: #999;
+    color: black;
+    transform: scale(1.05);
+}
+
+
+/* Button */
+.payment-button {
+    width: 100%;
+    padding: 14px;
+    font-size: 17px;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--button-bg, #665cff);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-button:hover:not(:disabled) {
+    background-color: #5146f0;
+    transform: scale(1.02);
+}
+
+.payment-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Secure Text */
+.payment-secure {
+    font-size: 13px;
+    margin-top: 8px;
+    color: #666;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

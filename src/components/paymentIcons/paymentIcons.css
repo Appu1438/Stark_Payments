@@ -1,0 +1,60 @@
+
+/* Payment Icons */
+/* Wrapper for scroll */
+.payment-icons-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE & Edge */
+}
+
+.payment-icons-wrapper::-webkit-scrollbar {
+    display: none;
+    /* Hide scrollbar for Chrome, Safari */
+}
+
+/* Scrollable container */
+.payment-icons {
+    display: flex;
+    gap: 15px;
+    padding: 10px;
+    min-width: max-content;
+    animation: scrollIcons 90s linear infinite;
+}
+
+.payment-icons img {
+    width: 50px;
+    /* Fixed width */
+    height: 50px;
+    /* Fixed height for uniform size */
+    object-fit: contain;
+    /* Keeps aspect ratio inside box */
+    background-color: white;
+    /* Optional: keeps icons visible if they are transparent */
+    border-radius: 8px;
+    /* Optional: smooth corners */
+    padding: 4px;
+    /* Optional: add some spacing inside */
+    filter: grayscale(0.3);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.payment-icons img:hover {
+    transform: scale(1.1);
+    filter: grayscale(0);
+}
+
+/* Keyframes for smooth auto-scroll */
+@keyframes scrollIcons {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
