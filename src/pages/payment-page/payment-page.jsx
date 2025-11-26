@@ -27,7 +27,7 @@ export default function PaymentPage() {
     const handlePayment = async () => {
         const amt = Number(amount);
 
-        // ✅ Validation
+        // 🔍 Basic validations
         if (!amt || amt <= 0) {
             alert("Enter a valid amount");
             return;
@@ -43,12 +43,49 @@ export default function PaymentPage() {
 
         setLoading(true);
         try {
-            const { data } = await axios.post(
-                `${process.env.REACT_APP_API_URL}/payments/create-order`,
-                { amount: Number(amount), driverId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            // Razorpay fee logic
+            const RAZORPAY_FEE_PERCENT = 0.02;
+            const GST_PERCENT = 0.18;
 
+            const netAmount = amt;
+            const fee = netAmount * RAZORPAY_FEE_PERCENT;
+            const gst = fee * GST_PERCENT;
+            const grossAmount = netAmount + fee + gst;
+
+            setGrossAmount(grossAmount);
+
+            // 🔥 CREATE ORDER
+            let createOrderRes;
+            try {
+                createOrderRes = await axios.post(
+                    `${process.env.REACT_APP_API_URL}/payments/create-order`,
+                    { amount: grossAmount, driverId },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            } catch (err) {
+                // ❗ Backend will return “first recharge ≥ 2000” error here
+                const msg = err?.response?.data?.message || "Order creation failed";
+
+                // Delete session on any failure
+                await axios.delete(
+                    `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                alert(msg);  // Show backend message
+                setLoading(false);
+                return;
+            }
+
+            const { data } = createOrderRes;
+
+            // ❗ If backend rejects (like first recharge < 2000) show the error
+            if (!data?.orderId) {
+                alert(data?.message || "Unable to create payment order");
+                return;
+            }
+
+            // 🔥 RAZORPAY OPTIONS
             const options = {
                 key: process.env.REACT_APP_RAZORPAY_KEY_ID,
                 amount: data.amount * 100,
@@ -58,24 +95,40 @@ export default function PaymentPage() {
                 order_id: data.orderId,
                 prefill: { name, email, contact: phone_number },
                 theme: { color: color.primary },
+
                 handler: async function (response) {
                     try {
-                        await axios.post(`${process.env.REACT_APP_API_URL}/payments/verify-payment`, response, {
-                            headers: { Authorization: `Bearer ${token}` }
-                        });
+                        await axios.post(
+                            `${process.env.REACT_APP_API_URL}/payments/verify-payment`,
+                            response,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
 
-                        await axios.delete(`${process.env.REACT_APP_API_URL}/session/${sessionId}`);
+                        await axios.delete(
+                            `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
+
                         alert("Wallet recharged successfully!");
                         window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-success`;
                     } catch (err) {
-                        await axios.delete(`${process.env.REACT_APP_API_URL}/session/${sessionId}`);
+                        await axios.delete(
+                            `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
+
                         alert("Payment verification failed");
                         window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-failed`;
                     }
                 },
+
                 modal: {
                     ondismiss: async function () {
-                        await axios.delete(`${process.env.REACT_APP_API_URL}/session/${sessionId}`);
+                        await axios.delete(
+                            `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                        );
+
                         alert("Payment cancelled");
                         window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-cancelled`;
                     },
@@ -86,12 +139,20 @@ export default function PaymentPage() {
             rzp.open();
         } catch (err) {
             console.error(err);
+
+            // Delete session on ANY unexpected error
+            await axios.delete(
+                `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
             alert("Something went wrong");
             window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-failed`;
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div
