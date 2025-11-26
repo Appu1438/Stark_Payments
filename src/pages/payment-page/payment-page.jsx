@@ -6,6 +6,7 @@ import './payment.css'
 import PaymentIcons from "../../components/paymentIcons/PaymentIcons";
 export default function PaymentPage() {
     const [amount, setAmount] = useState("");
+    const [grossAmount, setGrossAmount] = useState("");
     const [loading, setLoading] = useState(false);
     const { id: sessionId } = useParams();
     const [session, setSession] = useState(null);
@@ -65,13 +66,6 @@ export default function PaymentPage() {
             } catch (err) {
                 // ❗ Backend will return “first recharge ≥ 2000” error here
                 const msg = err?.response?.data?.message || "Order creation failed";
-
-                // Delete session on any failure
-                await axios.delete(
-                    `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-
                 alert(msg);  // Show backend message
                 setLoading(false);
                 return;
