@@ -104,7 +104,7 @@ export default function PaymentPage() {
                         );
 
                         alert("Wallet recharged successfully!");
-                        window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-success`;
+                        window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-success`;
                     } catch (err) {
                         await axios.delete(
                             `${process.env.REACT_APP_API_URL}/session/${sessionId}`,
@@ -112,7 +112,7 @@ export default function PaymentPage() {
                         );
 
                         alert("Payment verification failed");
-                        window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-failed`;
+                        window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-failed`;
                     }
                 },
 
@@ -124,7 +124,7 @@ export default function PaymentPage() {
                         );
 
                         alert("Payment cancelled");
-                        window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-cancelled`;
+                        window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-cancelled`;
                     },
                 },
             };
@@ -141,7 +141,7 @@ export default function PaymentPage() {
             );
 
             alert("Something went wrong");
-            window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}/--/wallet-failed`;
+            window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-failed`;
         } finally {
             setLoading(false);
         }
