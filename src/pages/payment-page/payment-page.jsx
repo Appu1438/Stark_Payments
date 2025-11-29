@@ -4,12 +4,20 @@ import { useParams } from "react-router-dom";
 import color from "../../themes/app.colors";
 import './payment.css'
 import PaymentIcons from "../../components/paymentIcons/PaymentIcons";
+import Toast from "../../components/toast/Toast";
 export default function PaymentPage() {
     const [amount, setAmount] = useState("");
     const [grossAmount, setGrossAmount] = useState("");
     const [loading, setLoading] = useState(false);
     const { id: sessionId } = useParams();
     const [session, setSession] = useState(null);
+
+    const [toast, setToast] = useState({ message: "", type: "" });
+
+    const showToast = (message, type = "info") => {
+        setToast({ message, type });
+    };
+
 
     useEffect(() => {
         axios
@@ -30,15 +38,15 @@ export default function PaymentPage() {
 
         // 🔍 Basic validations
         if (!amt || amt <= 0) {
-            alert("Enter a valid amount");
+            showToast("Enter a valid amount", "error");
             return;
         }
         if (amt < 250) {
-            alert("Minimum recharge amount is ₹250");
+            showToast("Minimum recharge amount is ₹250", "error");
             return;
         }
         if (amt % 50 !== 0) {
-            alert("Amount must be in multiples of ₹50");
+            showToast("Amount must be in multiples of ₹50", "warning");
             return;
         }
 
@@ -66,7 +74,7 @@ export default function PaymentPage() {
             } catch (err) {
                 // ❗ Backend will return “first recharge ≥ 2000” error here
                 const msg = err?.response?.data?.message || "Order creation failed";
-                alert(msg);  // Show backend message
+                showToast(msg, "error");
                 setLoading(false);
                 return;
             }
@@ -103,7 +111,7 @@ export default function PaymentPage() {
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
 
-                        alert("Wallet recharged successfully!");
+                        showToast("Wallet recharged successfully!", "success");
                         window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-success`;
                     } catch (err) {
                         await axios.delete(
@@ -111,7 +119,9 @@ export default function PaymentPage() {
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
 
-                        alert("Payment verification failed");
+                        showToast("Payment verification failed", "error");
+
+
                         window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-failed`;
                     }
                 },
@@ -123,7 +133,7 @@ export default function PaymentPage() {
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
 
-                        alert("Payment cancelled");
+                        showToast("Payment Cancelled", "warning");
                         window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-cancelled`;
                     },
                 },
@@ -140,7 +150,7 @@ export default function PaymentPage() {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            alert("Something went wrong");
+            showToast("Something went wrong", "warning");
             window.location.href = `${process.env.REACT_APP_EXPO_APP_URL}wallet-failed`;
         } finally {
             setLoading(false);
@@ -199,6 +209,14 @@ export default function PaymentPage() {
                     🔒 Your payment is processed securely by razorpay
                 </p>
             </div>
+            {toast.message && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast({ message: "", type: "" })}
+                />
+            )}
+
         </div>
     );
 
